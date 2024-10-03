@@ -1,6 +1,7 @@
 ---
 name: kyverno-policy-test
 on: # yamllint disable-line rule:truthy
+  workflow_dispatch:
   pull_request:
 jobs:
   test:
