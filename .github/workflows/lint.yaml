@@ -5,9 +5,12 @@ on: # yamllint disable-line rule:truthy
 jobs:
   yamllint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - name: yaml-lint
-        uses: ibiqlik/action-yamllint@v3
+      - name: Checkout repo
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # 4.2.0
+      - name: Lint YAML files
+        uses: ibiqlik/action-yamllint@2576378a8e339169678f9939646ee3ee325e845c # 3.1.1
         with:
           format: github

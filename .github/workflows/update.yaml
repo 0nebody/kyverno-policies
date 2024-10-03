@@ -36,19 +36,20 @@ jobs:
       - name: Install yamlfmt
         working-directory: /tmp
         run: |
-          curl -sfLO https://github.com/google/yamlfmt/releases/download/v${YAMLFMT_VERSION}/yamlfmt_${YAMLFMT_VERSION}_Linux_x86_64.tar.gz
-          tar -zxf yamlfmt_${YAMLFMT_VERSION}_Linux_x86_64.tar.gz
+          curl -sfL "https://github.com/google/yamlfmt/releases/download/v${YAMLFMT_VERSION}/yamlfmt_${YAMLFMT_VERSION}_Linux_x86_64.tar.gz" -o yamlfmt.tar.gz
+          tar -zxf yamlfmt.tar.gz
           sudo mv yamlfmt /usr/local/bin/yamlfmt
+          rm -rf yamlfmt.tar.gz
       - name: Format Kyverno policies
         run: |
           yamlfmt "${{ matrix.policies }}"
       - name: Create pull request
         uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # 7.0.5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: "${{ secrets.GITHUB_TOKEN }}"
           branch: "${{ matrix.policies }}-src"
           delete-branch: true
           commit-message: "update ${{ matrix.policies }} policies"
           title: "Update ${{ matrix.policies }} policies"
           body: |-
-            Update Kyverno policy ${{ matrix.policies }} from upstream [source repository](https://github.com/kyverno/policies)
+            Update Kyverno policy ${{ matrix.policies }} from upstream [source repository](https://github.com/kyverno/policies).
