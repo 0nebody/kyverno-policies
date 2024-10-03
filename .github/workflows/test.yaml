@@ -1,0 +1,20 @@
+---
+name: kyverno-policy-test
+on: # yamllint disable-line rule:truthy
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - name: Install Kyverno CLI
+        uses: kyverno/action-install-cli@v0.2.0
+        with:
+          release: "v1.12.6"
+      - name: Check install
+        run: kyverno version
+      - name: Test all pre-defined cases
+        run: kyverno test .

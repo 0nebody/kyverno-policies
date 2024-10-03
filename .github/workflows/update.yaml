@@ -1,0 +1,54 @@
+---
+name: kyverno-policy-update
+on: # yamllint disable-line rule:truthy
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
+permissions:
+  contents: write
+  pull-requests: write
+env:
+  YAMLFMT_VERSION: 0.13.0
+jobs:
+  update-policies:
+    strategy:
+      matrix:
+        policies:
+          - pod-security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # 4.2.0
+      - name: Checkout Kyverno policies
+        uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938 # 4.2.0
+        with:
+          repository: kyverno/policies
+          path: kyverno-policies-source
+      - name: Copy Kyverno policies
+        run: |
+          rm -rf "${{ matrix.policies }}"
+          cp -r "kyverno-policies-source/${{ matrix.policies }}" .
+          rm -rf kyverno-policies-source
+      - name: Cleanup coppied Kyverno policies
+        run: |
+          find "${{ matrix.policies }}" -type d -name .chainsaw-test -exec rm -rv {} +
+          find "${{ matrix.policies }}" -type f -name artifacthub-pkg.yml -exec rm {} +
+      - name: Install yamlfmt
+        working-directory: /tmp
+        run: |
+          curl -sfLO https://github.com/google/yamlfmt/releases/download/v${YAMLFMT_VERSION}/yamlfmt_${YAMLFMT_VERSION}_Linux_x86_64.tar.gz
+          tar -zxf yamlfmt_${YAMLFMT_VERSION}_Linux_x86_64.tar.gz
+          sudo mv yamlfmt /usr/local/bin/yamlfmt
+      - name: Format Kyverno policies
+        run: |
+          yamlfmt "${{ matrix.policies }}"
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # 7.0.5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "${{ matrix.policies }}-src"
+          delete-branch: true
+          commit-message: "update ${{ matrix.policies }} policies"
+          title: "Update ${{ matrix.policies }} policies"
+          body: |-
+            Update Kyverno policy ${{ matrix.policies }} from upstream [source repository](https://github.com/kyverno/policies)
