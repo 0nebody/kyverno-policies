@@ -7,4 +7,6 @@ ignore:
 rules:
   comments:
     min-spaces-from-content: 1
+  empty-lines:
+    level: warning
   line-length: disable
