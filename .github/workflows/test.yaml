@@ -10,7 +10,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout repo
-        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # 5.0.1
+        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # 6.0.0
       - name: Install Kyverno CLI
         uses: kyverno/action-install-cli@fcee92fca5c883169ef9927acf543e0b5fc58289 # 0.2.0
         with:
